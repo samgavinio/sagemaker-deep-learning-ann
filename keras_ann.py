@@ -21,20 +21,10 @@ def keras_model_fn(hyperparameters):
     classifier.compile(optimizer = hyperparameters["optimizer"], loss = "binary_crossentropy", metrics = ["accuracy"])
     return classifier
 
-def serving_input_fn(hyperparameters):
-    tensor = tf.placeholder(tf.float32, shape=(1024, 1024))
-    inputs = {INPUT_TENSOR_NAME: tensor}
-    return tf.estimator.export.ServingInputReceiver(inputs, inputs)
-
 # Return the training set
 def train_input_fn(training_dir, hyperparameters):    
     X_train = np.load(os.path.join(training_dir, 'train_X.npy'))
     y_train = np.load(os.path.join(training_dir, 'train_Y.npy'))
-
-    # Poor attempt at batching data
-    # dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-    # iterator = dataset.batch(10).make_one_shot_iterator()
-    # X_train, y_train = iterator.get_next()
 
     return {INPUT_TENSOR_NAME: X_train}, y_train
 
@@ -44,3 +34,14 @@ def eval_input_fn(training_dir, hyperparameters):
     y_test = np.load(os.path.join(training_dir, 'test_Y.npy'))
 
     return {INPUT_TENSOR_NAME: X_test}, y_test
+
+
+# See: https://sagemaker-workshop.com/custom/algo.html#serving-the-model
+# During an inference, the placeholder will be replaced. 
+# The dictionary key INPUT_TENSOR_NAME must match what will be passed during the training and inference.
+# The shape (1024, 11) means a 2D array of up to 1024 observations, each with 11 features
+def serving_input_fn(hyperparameters):
+    tensor = tf.placeholder(tf.float32, shape=(1024, 11))
+    inputs = {INPUT_TENSOR_NAME: tensor}
+
+    return tf.estimator.export.ServingInputReceiver(inputs, inputs)

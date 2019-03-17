@@ -7,9 +7,7 @@ from tensorflow.python.keras.layers import Dense
 
 INPUT_TENSOR_NAME = "inputs_input" # needs to match the name of the first layer + "_input"
 
-def model_builder(optimizer):
-    print(optimizer)
-    
+def model_builder(optimizer):    
     classifier = Sequential()
     classifier.add(Dense(units = 6, kernel_initializer = "uniform", activation = "relu", input_dim = 11, name = "inputs"))
     classifier.add(Dense(units = 6, kernel_initializer = "uniform", activation = "relu"))
@@ -18,18 +16,14 @@ def model_builder(optimizer):
     return classifier
 
 def get_input_data(training_dir):    
-    print(training_dir)
     X_train = np.load(os.path.join(training_dir, 'train_X.npy'))
     y_train = np.load(os.path.join(training_dir, 'train_Y.npy'))
-    print('X train', X_train.shape,'y train', y_train.shape)
     
     return {INPUT_TENSOR_NAME: X_train}, y_train
 
 def get_test_data(training_dir):
-    print(training_dir)
     X_test = np.load(os.path.join(training_dir, 'test_X.npy'))
     y_test = np.load(os.path.join(training_dir, 'test_Y.npy'))
-    print('X test', X_test.shape,'y test', y_test.shape)
 
     return {INPUT_TENSOR_NAME: X_test}, y_test
 
@@ -52,9 +46,7 @@ if __name__ =='__main__':
     X_test, y_test = get_test_data(args.eval)
     
     optimizer =  tf.train.AdamOptimizer(learning_rate=args.learning_rate)
-    
-    tf.train
-    
+
     classifier = model_builder(optimizer)
     classifier.summary()
     classifier.fit(X_train, y_train, epochs=args.epochs, verbose=1, batch_size = args.batch_size)
